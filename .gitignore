@@ -1,0 +1,12 @@
+# Bỏ qua các thư mục node_modules ở bất kỳ đâu
+**/node_modules
+
+# Bỏ qua các file .env ở bất kỳ đâu (Rất quan trọng!)
+**/.env
+
+# Bỏ qua thư mục build của React
+/frontend/build
+
+# Các file hệ thống của macOS
+.DS_Store
+
