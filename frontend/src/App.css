@@ -14,12 +14,12 @@
     align-items: center;
     gap: 1.5rem; 
 }
-.nav-left { }
+/* .nav-left { } */
 .nav-center {
     flex-grow: 1; 
     justify-content: center; 
 }
-.nav-right { }
+/* .nav-right { } */
 .nav-logo {
     font-size: 1.75rem;
     font-weight: bold;
