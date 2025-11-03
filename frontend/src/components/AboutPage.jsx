@@ -6,9 +6,9 @@ function AboutPage() {
         <div className="page-container">
             {/* Thêm animation trượt lên */}
             <div className="about-content animate-fade-in-up">
-                <h1>Về GameStore</h1>
+                <h1>Về NOXORA</h1>
                 <p>
-                    Chào mừng bạn đến với GameStore, dự án được xây dựng với niềm đam mê công nghệ MERN Stack (MongoDB, Express, React, Node.js) và tình yêu dành cho game.
+                    Chào mừng bạn đến với NOXORA, dự án được xây dựng với niềm đam mê công nghệ MERN Stack (MongoDB, Express, React, Node.js) và tình yêu dành cho game.
                 </p>
                 <p>
                     Đây là một trang web demo, mô phỏng đầy đủ các chức năng của một nền tảng thương mại điện tử hiện đại, bao gồm:

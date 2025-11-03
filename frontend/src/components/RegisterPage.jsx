@@ -56,7 +56,7 @@ function RegisterPage() {
                         />
                     </div>
                     
-                    <button type="submit" className="auth-button">Đăng ký</button>
+                    <button type="submit" className="auth-button">Đăng ký</button>;
                     
                     <p className="auth-switch-link">
                         Đã có tài khoản? <Link to="/login">Đăng nhập</Link>

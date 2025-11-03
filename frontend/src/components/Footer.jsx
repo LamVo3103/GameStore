@@ -6,8 +6,8 @@ function Footer() {
         <footer className="footer-container">
             <div className="footer-content">
                 <div className="footer-logo">
-                    <Link to="/" className="nav-logo">GameStore</Link>
-                    <p>&copy; 2024. Một sản phẩm MERN Stack.</p>
+                    <Link to="/" className="nav-logo">NOXORA</Link>
+                    <p>&copy; 2025. VoThanhLam_SamVuMinhAnh.</p>
                 </div>
                 <div className="footer-links">
                     <h4>Khám phá</h4>

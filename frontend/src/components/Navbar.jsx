@@ -31,7 +31,7 @@ function Navbar() {
             
             {/* --- 1. NHÓM BÊN TRÁI --- */}
             <div className="nav-left">
-                <Link to="/" className="nav-logo">GameStore</Link>
+                <Link to="/" className="nav-logo">NOXORA</Link>
                 <Link to="/about" className="nav-link">Giới thiệu</Link>
             </div>
             
