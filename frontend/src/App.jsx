@@ -12,7 +12,7 @@ import LoginPage from './components/LoginPage.jsx';
 import CartPage from './components/CartPage.jsx';
 import AboutPage from './components/AboutPage.jsx';
 import MyOrdersPage from './components/MyOrdersPage.jsx'; 
-// import ManageNewsPage from './components/ManageNewsPage.jsx'; (ĐÃ XÓA)
+import ScrollToTopButton from './components/ScrollToTopButton.jsx';
 import ManageGamesPage from './components/ManageGamesPage.jsx'; 
 
 import './App.css'; 
@@ -53,6 +53,7 @@ function App() {
         </Routes>
       </div>
       <Footer />
+      <ScrollToTopButton />
     </>
   );
 }

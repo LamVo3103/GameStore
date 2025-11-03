@@ -4,6 +4,11 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx'; // <-- SỬA LỖI: Thêm .jsx
 import { gameCategories } from '../categories.js'; // <-- SỬA LỖI: Thêm .js
 
+// --- 1. THÊM CÁC IMPORT NÀY ---
+import { useCart } from '../context/CartContext.jsx';
+import toast from 'react-hot-toast';
+// ------------------------------
+
 function HomePage() {
     // === STATE ===
     const [games, setGames] = useState([]); // Phải là mảng rỗng
@@ -16,6 +21,19 @@ function HomePage() {
 
     const { user } = useAuth();
     const [searchParams] = useSearchParams();
+
+    // --- 2. THÊM LOGIC GIỎ HÀNG ---
+    const { addToCart } = useCart(); // Lấy hàm từ context
+
+    const handleAddToCart = (e, game) => {
+        // Ngăn không cho thẻ <Link> bao ngoài bị kích hoạt
+        e.preventDefault(); 
+        e.stopPropagation(); 
+        
+        addToCart(game);
+        toast.success(`${game.name} đã được thêm vào giỏ!`);
+    };
+    // -------------------------------
 
     // === FUNCTIONS ===
 
@@ -115,11 +133,31 @@ function HomePage() {
                             >
                                 <Link to={`/game/${game._id}`} className="game-card-link">
                                     <img src={game.imageUrl} alt={game.name} />
+                                    
+                                    {/* --- 3. ĐÂY LÀ CODE HTML ĐÃ SỬA --- */}
                                     <div className="game-card-info">
                                         <h3>{game.name}</h3>
-                                        <p className="game-price">${game.price}</p>
-                                        <span className="game-card-category">{game.category}</span>
+
+                                        {/* Thêm 1 div bọc 2 cột ở dưới */}
+                                        <div className="game-card-bottom">
+                                            
+                                            {/* Cột 1: Giá và Thể loại */}
+                                            <div className="game-card-details">
+                                                <p className="game-price">${game.price}</p>
+                                                <span className="game-card-category">{game.category}</span>
+                                            </div>
+
+                                            {/* Cột 2: Nút bấm */}
+                                            <button 
+                                                className="home-add-to-cart-btn"
+                                                onClick={(e) => handleAddToCart(e, game)}
+                                            >
+                                                Thêm vào giỏ
+                                            </button>
+                                        </div>
+                                        
                                     </div>
+                                    {/* --- KẾT THÚC THAY THẾ --- */}
                                 </Link>
                             </div>
                         ))}
