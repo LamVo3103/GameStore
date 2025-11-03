@@ -26,8 +26,18 @@ const gameSchema = new Schema({
     galleryImages: {
         type: [String], // Một mảng các chuỗi (URLs)
         default: []     // Mặc định là một mảng rỗng
-    }
+    },
     // -----------------------
+
+    // --- THÊM TRƯỜNG MỚI ---
+    averageRating: {
+        type: Number,
+        default: 0
+    },
+    numReviews: {
+        type: Number,
+        default: 0
+    }
 
 }, { timestamps: true });
 

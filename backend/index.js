@@ -37,6 +37,10 @@ app.use('/api/orders', orderRouter);
 //     console.log(`Server is running on port: ${PORT} at http://127.0.0.1:${PORT}`);
 // });
 
+const reviewRouter = require('./routes/reviews'); 
+app.use('/api/reviews', reviewRouter);
+
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port: ${PORT} at http://127.0.0.1:${PORT}`);
 });
