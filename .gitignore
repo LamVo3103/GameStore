@@ -10,3 +10,6 @@
 # Các file hệ thống của macOS
 .DS_Store
 
+# File môi trường (Bí mật)
+.env
+.env.*
