@@ -14,11 +14,16 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    // --- THÊM TRƯỜNG MỚI ---
     role: {
         type: String,
         enum: ['user', 'admin'], // Chỉ cho phép 2 giá trị này
         default: 'user'       // Mặc định ai đăng ký cũng là 'user'
+    },
+    // --- THÊM TRƯỜNG MỚI ---
+    wishlist: {
+        type: [Schema.Types.ObjectId], // Một mảng các ID
+        ref: 'Game', // Tham chiếu đến model 'Game'
+        default: []
     }
     // -----------------------
 }, {
@@ -26,5 +31,4 @@ const userSchema = new Schema({
 });
 
 const User = mongoose.model('User', userSchema);
-
 module.exports = User;

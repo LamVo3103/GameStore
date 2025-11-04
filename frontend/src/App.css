@@ -1,3 +1,5 @@
+/* frontend/src/App.css */
+
 /* --- 1. NAVBAR --- */
 .navbar {
     display: flex;
@@ -14,12 +16,10 @@
     align-items: center;
     gap: 1.5rem; 
 }
-/* .nav-left { } */
 .nav-center {
     flex-grow: 1; 
     justify-content: center; 
 }
-/* .nav-right { } */
 .nav-logo {
     font-size: 1.75rem;
     font-weight: bold;
@@ -55,16 +55,23 @@
     background-color: #c7d5e0;
     color: #171a21;
 }
-.cart-link {
+
+/* --- ĐÃ SỬA ĐOẠN NÀY (Thêm .wishlist-nav-link) --- */
+.cart-link,
+.wishlist-nav-link {
     background-color: #4a5e73;
     padding: 5px 10px;
     border-radius: 4px;
     font-weight: bold;
+    margin-left: 0.5rem; /* Thêm khoảng cách */
 }
-.cart-link:hover {
+.cart-link:hover,
+.wishlist-nav-link:hover {
     background-color: #66c0f4;
     color: #1b2838;
 }
+/* --- KẾT THÚC SỬA --- */
+
 
 /* --- 2. LAYOUT CHUNG --- */
 .page-container {
@@ -1051,4 +1058,67 @@ body::-webkit-scrollbar-thumb:hover {
     background-color: #8dd4f8; /* Màu sáng hơn khi hover */
     transform: translateY(-3px); /* Hiệu ứng nhấc lên */
     opacity: 1;
+}
+
+/* --- 28. CSS CHO NÚT WISHLIST --- */
+
+/* Nút trên HomePage */
+.game-card {
+    position: relative; /* Cần thiết để định vị nút con */
+}
+
+.wishlist-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10; /* Nổi trên ảnh */
+    
+    background-color: rgba(27, 40, 56, 0.7); /* Màu nền tối mờ */
+    color: #ffffff; /* Màu trái tim (chữ) */
+    border: none;
+    border-radius: 50%; /* Hình tròn */
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    line-height: 40px; /* Căn giữa trái tim */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0; /* Đảm bảo căn chuẩn */
+}
+
+.wishlist-btn:hover {
+    background-color: rgba(240, 60, 60, 0.8); /* Chuyển sang đỏ mờ khi hover */
+}
+
+/* Nút khi đã được "thích" */
+.wishlist-btn.active {
+    background-color: #f03c3c; /* Màu đỏ rực */
+    color: #ffffff;
+    transform: scale(1.1); /* Phóng to nhẹ */
+}
+
+/* Nút trên GameDetailPage (không cần absolute) */
+.wishlist-btn.detail-page {
+    position: static; /* Reset lại */
+    background-color: #4a5e73;
+    color: #ffffff;
+    /* Tái sử dụng kích thước */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    padding: 0;
+    line-height: 40px;
+    flex-shrink: 0; /* Ngăn nút bị méo */
+}
+
+.wishlist-btn.detail-page.active {
+    background-color: #f03c3c;
+    transform: none; /* Không cần phóng to ở đây */
+}
+
+.wishlist-btn.detail-page:hover {
+    background-color: #f03c3c;
+    transform: none;
 }

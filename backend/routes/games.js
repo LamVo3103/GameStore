@@ -1,46 +1,48 @@
-const router = require('express').Router();
-const { Game } = require('../models/game.model'); 
+// backend/routes/games.js
 
-// --- API 1: LẤY GAME (NÂNG CẤP VỚI PHÂN TRANG) ---
+const router = require('express').Router();
+const { Game } = require('../models/game.model');
+
+// --- API 1: LẤY GAME (ĐÃ SỬA LỖI PHÂN TRANG) ---
 router.route('/').get(async (req, res) => {
     try {
-        const { category, search, page } = req.query; // Thêm 'page'
+        // 1. Đọc 'limit' và 'page' từ query
+        const { category, search, page, limit } = req.query; 
 
-        const limit = 9; // 9 sản phẩm mỗi trang
-        const currentPage = Number(page) || 1; // Trang hiện tại, mặc định là 1
-        const skip = (currentPage - 1) * limit; // Bỏ qua bao nhiêu sản phẩm
+        // 2. Nếu 'limit' được cung cấp (ví dụ: 1000), thì dùng nó. Nếu không, mặc định là 9.
+        const pageLimit = Number(limit) || 9; 
+        
+        const currentPage = Number(page) || 1; 
+        const skip = (currentPage - 1) * pageLimit; // 3. Dùng pageLimit
 
-        let filter = {}; // Bộ lọc
+        let filter = {}; 
 
         // 1. Lọc theo Category
         if (category && category !== 'Tất cả') {
             filter.category = category;
         }
-
         // 2. Lọc theo Search
         if (search) {
-            filter.name = { 
+            filter.name = {
                 $regex: search,
                 $options: 'i'
             };
         }
-        
-        // 3. Lấy TỔNG SỐ game (để tính số trang)
-        // Đếm tổng số game KHỚP VỚI BỘ LỌC
-        const totalGames = await Game.countDocuments(filter);
 
+        // 3. Lấy TỔNG SỐ game (để tính số trang)
+        const totalGames = await Game.countDocuments(filter);
+        
         // 4. Lấy game CỦA TRANG HIỆN TẠI
         const games = await Game.find(filter)
-            .sort({ createdAt: -1 }) // Sắp xếp game mới lên đầu
-            .limit(limit) // Giới hạn 9 game
-            .skip(skip);  // Bỏ qua các trang trước
+            .sort({ createdAt: -1 }) 
+            .limit(pageLimit) // 4. Dùng pageLimit
+            .skip(skip);
 
-        // 5. Trả về cả 2
+        // 5. Trả về
         res.json({
-            games: games, // Danh sách game của trang này
-            totalPages: Math.ceil(totalGames / limit) // Tổng số trang
+            games: games, 
+            totalPages: Math.ceil(totalGames / pageLimit) // 5. Dùng pageLimit
         });
-
     } catch (err) {
         res.status(400).json('Error: ' + err);
     }

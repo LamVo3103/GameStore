@@ -1,16 +1,19 @@
+// frontend/src/components/Navbar.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext'; // <-- 1. THÊM DÒNG NÀY
 
 function Navbar() {
     const { user, logout } = useAuth();
     const { cartItems } = useCart();
+    const { wishlistIds } = useWishlist(); // <-- 2. THÊM DÒNG NÀY
     const navigate = useNavigate();
-    
+
     const [searchTerm, setSearchTerm] = useState('');
     const [isAdminDropdownOpen, setAdminDropdownOpen] = useState(false);
-
+    
     const handleLogout = () => {
         logout();
         navigate('/login');
@@ -20,21 +23,22 @@ function Navbar() {
         e.preventDefault();
         if (searchTerm.trim()) {
             navigate(`/?search=${searchTerm}`);
-            setSearchTerm(''); 
+            setSearchTerm('');
         }
     };
 
     const totalItemsInCart = cartItems.length;
+    const totalItemsInWishlist = wishlistIds.size; // <-- 3. THÊM DÒNG NÀY
 
     return (
         <nav className="navbar">
-            
+
             {/* --- 1. NHÓM BÊN TRÁI --- */}
             <div className="nav-left">
                 <Link to="/" className="nav-logo">NOXORA</Link>
                 <Link to="/about" className="nav-link">Giới thiệu</Link>
             </div>
-            
+
             {/* --- 2. NHÓM Ở GIỮA (Search) --- */}
             <div className="nav-center">
                 <form onSubmit={handleSearchSubmit} className="nav-search-form">
@@ -47,21 +51,25 @@ function Navbar() {
                     />
                 </form>
             </div>
-
+            
             {/* --- 3. NHÓM BÊN PHẢI (Actions: Cart & Auth) --- */}
             <div className="nav-right">
+                {/* 4. THÊM LINK MỚI VÀ CLASS MỚI */}
+                <Link to="/wishlist" className="nav-link wishlist-nav-link">
+                    Yêu thích ({totalItemsInWishlist})
+                </Link>
+
                 <Link to="/cart" className="nav-link cart-link">
                     Giỏ hàng ({totalItemsInCart})
                 </Link>
-                
-                <div className="nav-separator"></div>
 
+                <div className="nav-separator"></div>
                 {user ? (
                     // --- NẾU ĐÃ ĐĂNG NHẬP ---
                     <>
-                        {/* --- MENU ADMIN DROPDOWN (ĐÃ SỬA) --- */}
+                        {/* --- MENU ADMIN DROPDOWN --- */}
                         {user.role === 'admin' && (
-                            <div 
+                            <div
                                 className="nav-dropdown"
                                 onMouseEnter={() => setAdminDropdownOpen(true)}
                                 onMouseLeave={() => setAdminDropdownOpen(false)}
@@ -72,12 +80,11 @@ function Navbar() {
                                 {isAdminDropdownOpen && (
                                     <div className="dropdown-menu">
                                         <Link to="/admin/games">Quản lý Game</Link>
-                                        {/* Link "Quản lý Tin tức" đã bị xóa */}
                                     </div>
                                 )}
                             </div>
                         )}
-                        
+
                         <Link to="/my-orders" className="nav-link">
                             Đơn hàng
                         </Link>

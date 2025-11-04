@@ -1,4 +1,7 @@
+// frontend/src/context/AuthContext.jsx
+
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useWishlist } from './WishlistContext'; // <-- 1. THÊM DÒNG NÀY
 
 // 1. Tạo "ngăn" Context
 const AuthContext = createContext(null);
@@ -7,6 +10,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
+    const { fetchWishlistIds, clearWishlist } = useWishlist(); // <-- 2. THÊM DÒNG NÀY
 
     // 3. Khi app vừa tải, kiểm tra xem có token trong LocalStorage không
     useEffect(() => {
@@ -14,10 +18,12 @@ export function AuthProvider({ children }) {
         const storedUser = localStorage.getItem('user');
 
         if (storedToken && storedUser) {
+            const userData = JSON.parse(storedUser); // User được lưu dạng JSON string
             setToken(storedToken);
-            setUser(JSON.parse(storedUser)); // User được lưu dạng JSON string
+            setUser(userData);
+            fetchWishlistIds(userData.id); // <-- 3. THÊM DÒNG NÀY (Tải wishlist nếu F5)
         }
-    }, []);
+    }, []); // Chỉ chạy 1 lần khi app tải
 
     // 4. Hàm để Đăng nhập (cất vào ví)
     const login = (newToken, userData) => {
@@ -26,6 +32,7 @@ export function AuthProvider({ children }) {
         // Lưu vào LocalStorage để khi F5 không bị mất
         localStorage.setItem('token', newToken);
         localStorage.setItem('user', JSON.stringify(userData));
+        fetchWishlistIds(userData.id); // <-- 4. THÊM DÒNG NÀY (Tải wishlist khi đăng nhập)
     };
 
     // 5. Hàm để Đăng xuất (xóa khỏi ví)
@@ -35,6 +42,7 @@ export function AuthProvider({ children }) {
         // Xóa khỏi LocalStorage
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        clearWishlist(); // <-- 5. THÊM DÒNG NÀY (Xóa wishlist khỏi state)
     };
 
     // 6. Cung cấp "ví" cho các component con

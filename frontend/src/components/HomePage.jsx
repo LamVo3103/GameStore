@@ -1,43 +1,49 @@
+// frontend/src/components/HomePage.jsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx'; // <-- SỬA LỖI: Thêm .jsx
-import { gameCategories } from '../categories.js'; // <-- SỬA LỖI: Thêm .js
+import { useAuth } from '../context/AuthContext.jsx'; 
+import { gameCategories } from '../categories.js'; 
 
-// --- 1. THÊM CÁC IMPORT NÀY ---
 import { useCart } from '../context/CartContext.jsx';
+import { useWishlist } from '../context/WishlistContext.jsx'; // <-- 1. THÊM DÒNG NÀY
 import toast from 'react-hot-toast';
-// ------------------------------
 
 function HomePage() {
     // === STATE ===
-    const [games, setGames] = useState([]); // Phải là mảng rỗng
+    const [games, setGames] = useState([]); 
     const [loadingGames, setLoadingGames] = useState(true); 
     const [filterCategory, setFilterCategory] = useState('Tất cả');
-    
-    // State cho Phân trang
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
 
     const { user } = useAuth();
     const [searchParams] = useSearchParams();
 
-    // --- 2. THÊM LOGIC GIỎ HÀNG ---
-    const { addToCart } = useCart(); // Lấy hàm từ context
+    // === HOOKS ===
+    const { addToCart } = useCart(); 
+    const { toggleWishlist, isWishlisted } = useWishlist(); // <-- 2. THÊM DÒNG NÀY
 
+    // === FUNCTIONS ===
     const handleAddToCart = (e, game) => {
-        // Ngăn không cho thẻ <Link> bao ngoài bị kích hoạt
         e.preventDefault(); 
         e.stopPropagation(); 
-        
         addToCart(game);
         toast.success(`${game.name} đã được thêm vào giỏ!`);
     };
-    // -------------------------------
 
-    // === FUNCTIONS ===
+    // 3. THÊM HÀM MỚI
+    const handleToggleWishlist = (e, game) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!user) {
+            toast.error("Vui lòng đăng nhập để sử dụng chức năng này!");
+            return;
+        }
+        toggleWishlist(user.id, game);
+    };
 
-    // 1. Lấy game (Đã sửa để hiểu Phân trang)
+    // 1. Lấy game
     const fetchGames = async () => {
         setLoadingGames(true);
         const currentSearchTerm = searchParams.get('search') || ''; 
@@ -49,33 +55,28 @@ function HomePage() {
                     page: currentPage 
                 }
             });
-            // --- ĐÂY LÀ CHỖ SỬA ---
-            setGames(response.data.games); // Lấy danh sách TỪ VẬT THỂ
+            setGames(response.data.games); 
             setTotalPages(response.data.totalPages); 
 
         } catch (error) {
             console.error("Có lỗi khi lấy dữ liệu game!", error);
-            setGames([]); // Nếu lỗi, đặt là mảng rỗng
+            setGames([]); 
         } finally {
             setLoadingGames(false); 
         }
     };
-
     // 2. useEffect TẢI GAME
     useEffect(() => {
         fetchGames();
     }, [filterCategory, searchParams, currentPage]);
-
     // 3. useEffect TÁI TẠO (Reset về Trang 1 khi Lọc/Search)
     useEffect(() => {
         setCurrentPage(1); 
     }, [filterCategory, searchParams]);
-
     // 4. HÀM ĐỂ VẼ CÁC NÚT BẤM PHÂN TRANG
     const renderPaginationButtons = () => {
         if (totalPages <= 1) return null;
         const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-
         return (
             <div className="pagination-container">
                 {pages.map(pageNumber => (
@@ -131,23 +132,26 @@ function HomePage() {
                                 className="game-card animate-fade-in-up" 
                                 style={{ animationDelay: `${index * 50}ms` }}
                             >
+                                {/* 4. THÊM NÚT WISHLIST VÀO ĐÂY */}
+                                <button
+                                    className={`wishlist-btn ${isWishlisted(game._id) ? 'active' : ''}`}
+                                    onClick={(e) => handleToggleWishlist(e, game)}
+                                    title="Thêm vào yêu thích"
+                                >
+                                    ❤️
+                                </button>
+                                {/* ----------------------- */}
+
                                 <Link to={`/game/${game._id}`} className="game-card-link">
                                     <img src={game.imageUrl} alt={game.name} />
                                     
-                                    {/* --- 3. ĐÂY LÀ CODE HTML ĐÃ SỬA --- */}
                                     <div className="game-card-info">
                                         <h3>{game.name}</h3>
-
-                                        {/* Thêm 1 div bọc 2 cột ở dưới */}
                                         <div className="game-card-bottom">
-                                            
-                                            {/* Cột 1: Giá và Thể loại */}
                                             <div className="game-card-details">
                                                 <p className="game-price">${game.price}</p>
                                                 <span className="game-card-category">{game.category}</span>
                                             </div>
-
-                                            {/* Cột 2: Nút bấm */}
                                             <button 
                                                 className="home-add-to-cart-btn"
                                                 onClick={(e) => handleAddToCart(e, game)}
@@ -155,9 +159,7 @@ function HomePage() {
                                                 Thêm vào giỏ
                                             </button>
                                         </div>
-                                        
                                     </div>
-                                    {/* --- KẾT THÚC THAY THẾ --- */}
                                 </Link>
                             </div>
                         ))}

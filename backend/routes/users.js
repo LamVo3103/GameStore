@@ -5,33 +5,24 @@ const jwt = require('jsonwebtoken'); // Để tạo token
 let User = require('../models/user.model'); // Import User model
 
 // --- API 1: ĐĂNG KÝ (REGISTER) ---
-// Đường dẫn: /api/users/register
+// (Code gốc của bạn)
 router.route('/register').post(async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // 1. Kiểm tra input
         if (!email || !password) {
             return res.status(400).json('Vui lòng nhập đầy đủ email và mật khẩu.');
         }
-
-        // 2. Kiểm tra xem email đã tồn tại chưa
         const userExists = await User.findOne({ email: email });
         if (userExists) {
             return res.status(400).json('Email này đã được đăng ký.');
         }
-
-        // 3. Mã hóa mật khẩu
-        const salt = await bcrypt.genSalt(10); // Tạo "muối"
-        const hashedPassword = await bcrypt.hash(password, salt); // "Băm" mật khẩu
-
-        // 4. Tạo user mới
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
         const newUser = new User({
             email: email,
-            password: hashedPassword, // Lưu mật khẩu đã mã hóa
+            password: hashedPassword,
         });
-
-        // 5. Lưu user vào database
         await newUser.save();
         res.json('Đăng ký tài khoản thành công!');
 
@@ -41,56 +32,97 @@ router.route('/register').post(async (req, res) => {
 });
 
 // --- API 2: ĐĂNG NHẬP (LOGIN) ---
-// Đường dẫn: /api/users/login
+// (Code gốc của bạn)
 router.route('/login').post(async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // 1. Kiểm tra input
         if (!email || !password) {
             return res.status(400).json('Vui lòng nhập đầy đủ email và mật khẩu.');
         }
-
-        // 2. Tìm user trong database
         const user = await User.findOne({ email: email });
         if (!user) {
             return res.status(400).json('Email hoặc mật khẩu không đúng.');
         }
-
-        // 3. So sánh mật khẩu
         const isMatch = await bcrypt.compare(password, user.password);
-
         if (!isMatch) {
             return res.status(400).json('Email hoặc mật khẩu không đúng.');
         }
-
-        // 4. TẠO TOKEN (VÉ VÀO CỬA)
         const payload = {
             id: user._id,
             email: user.email
         };
-        
-        // Hãy chắc chắn bạn đã thêm JWT_SECRET vào file .env
         const token = jwt.sign(
             payload,
             process.env.JWT_SECRET, 
-            { expiresIn: '1h' } // Token hết hạn sau 1 giờ
+            { expiresIn: '1h' }
         );
-
-        // 5. Gửi token về cho frontend
         res.json({
             message: 'Đăng nhập thành công!',
             token: token,
             user: { 
                 id: user._id,
                 email: user.email,
-                role: user.role // <-- THÊM DÒNG NÀY
+                role: user.role
             }
         });
-
     } catch (err) {
         res.status(500).json('Lỗi server: ' + err);
     }
 });
+
+// --- CÁC API MỚI CHO WISHLIST ---
+
+// --- API 3: TOGGLE WISHLIST (Thêm/Xóa) ---
+// POST /api/users/wishlist/toggle
+router.route('/wishlist/toggle').post(async (req, res) => {
+    const { userId, gameId } = req.body;
+    try {
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json('Không tìm thấy user.');
+
+        const index = user.wishlist.indexOf(gameId);
+        
+        if (index > -1) {
+            // Đã có -> Xóa đi ($pull)
+            user.wishlist.pull(gameId);
+            await user.save();
+            res.json({ message: 'Đã xóa khỏi wishlist', action: 'removed' });
+        } else {
+            // Chưa có -> Thêm vào ($push)
+            user.wishlist.push(gameId);
+            await user.save();
+            res.json({ message: 'Đã thêm vào wishlist', action: 'added' });
+        }
+    } catch (err) {
+        res.status(500).json('Lỗi server: ' + err);
+    }
+});
+
+// --- API 4: LẤY WISHLIST (CHỈ LẤY ID) ---
+// GET /api/users/wishlist/ids/:userId
+router.route('/wishlist/ids/:userId').get(async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId).select('wishlist');
+        if (!user) return res.status(404).json('Không tìm thấy user.');
+        res.json(user.wishlist); // Trả về mảng các ID
+    } catch (err) {
+        res.status(500).json('Lỗi server: ' + err);
+    }
+});
+
+// --- API 5: LẤY WISHLIST (FULL DATA) ---
+// GET /api/users/wishlist/full/:userId
+router.route('/wishlist/full/:userId').get(async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId)
+                              .populate('wishlist'); // <-- Tự động join với bảng Game
+        if (!user) return res.status(404).json('Không tìm thấy user.');
+        res.json(user.wishlist); // Trả về mảng các object Game
+    } catch (err) {
+        res.status(500).json('Lỗi server: ' + err);
+    }
+});
+// ---------------------------------
 
 module.exports = router;

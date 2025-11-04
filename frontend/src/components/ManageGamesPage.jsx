@@ -1,3 +1,5 @@
+// frontend/src/components/ManageGamesPage.jsx
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -21,14 +23,15 @@ function ManageGamesPage() {
 
     // === FUNCTIONS ===
 
-    // 1. Lấy tất cả game (Sửa lỗi Phân trang)
+    // 1. Lấy tất cả game
     const fetchGames = async () => {
         setLoading(true);
         try {
-            // API /api/games trả về { games: [...] }
-            const response = await axios.get('http://127.0.0.1:5001/api/games'); 
+            // --- ĐÂY LÀ DÒNG ĐÃ SỬA ---
+            // Yêu cầu API trả về 1000 game thay vì 9 game mặc định
+            const response = await axios.get('http://127.0.0.1:5001/api/games?limit=1000'); 
+            // --------------------------
             
-            // --- ĐÂY LÀ CHỖ SỬA ---
             setGames(response.data.games); // Lấy danh sách TỪ VẬT THỂ
             
         } catch (error) {
@@ -114,7 +117,7 @@ function ManageGamesPage() {
             <hr />
             
             {/* 2. Danh sách Game (Để Sửa/Xóa) */}
-            <h2>Danh sách Game hiện có</h2>
+            <h2>Danh sách Game hiện có ({games.length})</h2>
             {loading ? (
                 <p>Đang tải danh sách game...</p>
             ) : (
